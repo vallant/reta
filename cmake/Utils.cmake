@@ -1,6 +1,9 @@
 function(reta_group_target_sources TARGET)
-  get_target_property(TARGET_SOURCES ${TARGET} SOURCES)
-  source_group(TREE ${CMAKE_SOURCE_DIR} FILES ${TARGET_SOURCES})
+  if(USE_SOURCE_GROUPS)
+    get_target_property(TARGET_SOURCES ${TARGET} SOURCES)
+    source_group(TREE ${CMAKE_SOURCE_DIR} FILES ${TARGET_SOURCES})
+  endif()
+
 endfunction()
 
 macro(reta_ifelse SEARCH_VAR OUT_VAR IF_VALUE ELSE_VALUE)

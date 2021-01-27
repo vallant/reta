@@ -24,7 +24,7 @@ function(reta_add_helper_targets)
     CPPCHECK
     NAMES cppcheck.exe cppcheck
     PATHS "C:\\Program Files\\Cppcheck" "/usr/local/bin/")
-    
+
   if(CPPCHECK)
     add_custom_target(
       run_analysis
