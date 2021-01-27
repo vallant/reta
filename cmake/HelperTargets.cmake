@@ -7,11 +7,6 @@ function(reta_add_helper_targets)
     COMPONENTS Interpreter
     REQUIRED)
 
-  find_program(
-    CPPCHECK
-    NAMES cppcheck.exe cppcheck REQUIRED
-    PATHS "C:\\Program Files\\Cppcheck" "/usr/local/bin/")
-
   add_custom_target(
     run_catch
     COMMAND "$<TARGET_FILE:reta_test>" "--durations" "yes" "-r" "junit" "-o" "${CATCH_XML}"
@@ -25,18 +20,25 @@ function(reta_add_helper_targets)
   # add_custom_target(run_tests DEPENDS run_catch run_python_test)
   add_custom_target(run_tests DEPENDS run_catch)
 
-  add_custom_target(
-    run_analysis
-    ${CPPCHECK}
-    "--enable=warning,style,performance,portability"
-    "--language=c++"
-    "--force"
-    "--quiet"
-    "--inline-suppr"
-    "--suppressions-list=.cppcheck-suppressions"
-    ${CPPCHECK_REPORTER}
-    "src"
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+  find_program(
+    CPPCHECK
+    NAMES cppcheck.exe cppcheck
+    PATHS "C:\\Program Files\\Cppcheck" "/usr/local/bin/")
+    
+  if(CPPCHECK)
+    add_custom_target(
+      run_analysis
+      ${CPPCHECK}
+      "--enable=warning,style,performance,portability"
+      "--language=c++"
+      "--force"
+      "--quiet"
+      "--inline-suppr"
+      "--suppressions-list=.cppcheck-suppressions"
+      ${CPPCHECK_REPORTER}
+      "src"
+      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+  endif()
 
   add_custom_target(
     run_clang_format
