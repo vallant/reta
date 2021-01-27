@@ -1,0 +1,15 @@
+function(reta_group_target_sources TARGET)
+  if(USE_SOURCE_GROUPS)
+    get_target_property(TARGET_SOURCES ${TARGET} SOURCES)
+    source_group(TREE ${CMAKE_SOURCE_DIR} FILES ${TARGET_SOURCES})
+  endif()
+
+endfunction()
+
+macro(reta_ifelse SEARCH_VAR OUT_VAR IF_VALUE ELSE_VALUE)
+  if(DEFINED ${SEARCH_VAR} OR DEFINED ENV{${SEARCH_VAR}})
+    set(${OUT_VAR} ${IF_VALUE})
+  else()
+    set(${OUT_VAR} ${ELSE_VALUE})
+  endif()
+endmacro()

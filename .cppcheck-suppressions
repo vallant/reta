@@ -1,0 +1,2 @@
+// this would require to use std::transform instead of a for-each loop
+useStlAlgorithm

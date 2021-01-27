@@ -1,0 +1,19 @@
+target_sources(
+  reta_common
+  PRIVATE Command.h
+          CompareCommand.h
+          CompareCommand.cpp
+          GenerateCommand.cpp
+          GenerateCommand.h
+          InfoCommand.h
+          InfoCommand.cpp
+          TestCommand.h
+          TestCommand.cpp
+          ReduceCommand.cpp
+          ReduceCommand.h
+          ServeCommand.h
+          ServeCommand.cpp
+          UpdateCommand.cpp
+          UpdateCommand.h
+          FastCommand.cpp
+          FastCommand.h)

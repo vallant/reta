@@ -1,0 +1,24 @@
+[submodule "ext/Catch2"]
+	path = ext/Catch2
+	url = https://github.com/catchorg/Catch2.git
+[submodule "ext/juce"]
+	path = ext/juce
+	url = https://github.com/juce-framework/JUCE.git
+[submodule "ext/CLI11"]
+	path = ext/CLI11
+	url = https://github.com/CLIUtils/CLI11.git
+[submodule "ext/run-clang-format"]
+	path = ext/run-clang-format
+	url = https://github.com/Sarcasm/run-clang-format.git
+[submodule "ext/Frequalizer.git"]
+	path = ext/Frequalizer
+	url = https://github.com/ffAudio/Frequalizer.git
+[submodule "ext/json"]
+	path = ext/json
+	url = https://github.com/nlohmann/json.git
+[submodule "ext/dither-cxx"]
+	path = ext/dither-cxx
+	url = https://github.com/vallant/dither-cxx.git
+[submodule "ext/cpp-httplib"]
+	path = ext/cpp-httplib
+	url = https://github.com/yhirose/cpp-httplib.git
