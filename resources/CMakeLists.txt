@@ -1,0 +1,5 @@
+set(SOURCES 1.wav 2.wav 3.wav 4.wav)
+if(USE_ACTS)
+  list(APPEND SOURCES acts.jar)
+endif()
+juce_add_binary_data(reta_binary SOURCES ${SOURCES})

@@ -1,0 +1,12 @@
+[System]
+Name: Foobar
+[Parameter]
+BlockSize (enum): 32, 64, 128, 256, 512, 1024, 2048
+SampleRate (enum): 44100, 48000, 88200, 96000
+BusLayout (enum): 0, 1, 2, 3
+Signal(enum): 0, 1, 2, 3
+Parameter0(enum): 0.0, 0.25, 0.5, 0.75, 1.0
+Parameter1(enum): 0.0, 0.25, 0.5, 0.75, 1.0
+Parameter2(enum): 0.0, 0.25, 0.5, 0.75, 1.0
+Parameter3(enum): 0.0, 0.25, 0.5, 0.75, 1.0
+Parameter4(enum): 0.0, 0.25, 0.5, 0.75, 1.0

@@ -1,0 +1,186 @@
+# reta
+`reta` is a cross-plattform regression testing tool for audio plugins. It is intended to be used as a continous integration tool, helping to identify differences in the exposed information and the audio processing between different versions of a plugin. It can be used to compare audio processing between plugins compiled on different operating and formats using the built-in http-server.
+* Supported operating systems: Windows, Linux, MacOS
+* Supported audio formats: VST3, AU (MacOS only), VST2 (if the sdk is available at compilation)
+
+---
+
+## Usage
+### tl;dr
+    # print help for program or individual commands
+    $ ./reta [fast|info|generate|test|compare|reduce|serve|update] -h
+
+    # fast regression testing between two plugins
+    $ ./reta fast --reference reference.vst3 --actual actual.vst3 --output output.json [--verbose]
+
+    # individual stages
+    $ ./reta info     --input plugin.vst3 --output info.json [--verbose]
+    $ ./reta generate --input info.json --output config.json
+    $ ./reta test     --input plugin.vst3 --config config.json --output output/ [--verbose]
+    $ ./reta compare  --reference reference/ --actual actual/ --output log.json [--verbose]
+    $ ./reta reduce   --reference reference.vst3 --actual actual.vst3 --log log.json --config config.json --output output.json [--verbose]
+---
+### Info command
+
+    $ ./reta info -h
+    return info of plugin in json format
+    Usage: reta info [OPTIONS]
+
+    Options:
+    -h,--help                   Print this help message and exit
+    -i,--input TEXT REQUIRED    path to plugin
+    -o,--output TEXT REQUIRED   path to output file
+    -v,--verbose                print info on command line too
+
+Using the info command you can collect all visible information about the plugin and save it into a json file, or additionally on the command line. The output file will be overridden if it already exists.
+
+---
+### Generate Command
+    $ ./reta generate -h
+    Generate json containing test configs
+    Usage: reta generate [OPTIONS]
+
+    Options:
+    -h,--help                   Print this help message and exit
+    -i,--input TEXT REQUIRED    Plugin path
+    -o,--output TEXT REQUIRED   json output path
+    -s,--strategy TEXT:{dither,random}
+                                Generation strategy (default: random)
+    -d,--degree INT             Number of interactions for combinatorial testing (default: 2)
+    -e,--exclude TEXT ...       Dont modify parameters with this name
+    -n,--num INT                max. number of tests (default: 100)
+    --seed INT                  Seed for random generator (default: 42)
+
+The generate command is used to generate a set of tests based on the plugin info collected by the info command. To generate the tests there are two fundamental strategies available:
+
+* Random testing: Using the `--num` option you can specify the number of tests that should be chosen. For each continous parameter in each test, a random value in the range [0, 1] will be chosen. For discrete parameters (e.g. choice), a random choice will be made for each test. Additionally, with a certain chance the value will *not* be changed by the test, so that also default values are covered. You can use the `--seed` value to change the seed for the random number generator. If using random testing, the `--degree` parameter will be ignored.
+* Combinatorial testing using the `dither` library. This means that parameters are assumed to be discrete with possible values 0.0, 0.25, ... , 1.0. Then tests are generated such that there is *at least* one test that uses e.g. value 0.0 from parameter 1 alongside with value 0.25 from parameter 2. Tests are generated so that every combination between two parameter-values is covered at least once. You may choose to cover all combinations of three parameters using the `--degree` parameter, but note that the number of generated tests will increase quickly. If using combinatorial testing, the `--num` and `--seed` options will be ignored.
+
+You may use the `--exclude` option to exclude one or more parameters from testing. In this case they will be left untouched, so it will always have the default value as specified by the plugin.
+
+---
+### Test Command
+    $ ./reta test -h
+    Test plugin using json
+    Usage: reta test [OPTIONS]
+
+    Options:
+    -h,--help                   Print this help message and exit
+    -i,--input TEXT REQUIRED    Plugin path
+    -o,--output TEXT REQUIRED   Output folder
+    -c,--config TEXT REQUIRED   JSON file containing test configs to be used
+    -v,--verbose                Print progress on console
+
+Using the test command the audio processing is tested using the configuration generated in the generate step. This will create a folder at the path specified by the `--output` option. In this folder all relevant information about the plugin and the testing itself will be placed, as well as a number of audio files that were generated by the testing. At the moment the input files are just white noise, but it is planned to include different types of input signals, as well as an option to test user-provided audio files.
+
+---
+### Compare Command
+
+    $ ./reta compare -h
+    compare results in two folders
+    Usage: reta compare [OPTIONS]
+
+    Options:
+    -h,--help                   Print this help message and exit
+    -r,--reference TEXT         Path to reference folder
+    -a,--actual TEXT REQUIRED   Path to actual folder
+    -o,--output TEXT REQUIRED   Path to output folder
+    -d,--delta FLOAT            Allowed delta (default: 0.001f)
+    -u,--url TEXT Needs: --key  Url of reference server
+    -k,--key TEXT               Key of the plugin on the server
+
+Using the compare command you can identify differences in the base information of the plugin (e.g. latency, supported bus layouts), as well as in the audio processing of the plugin.
+For specifying the reference two options are supported.
+* If using the `--reference` option, you specify a local folder that holds information generated by the test command and the reference plugin version.
+* If using the `--url` and `--key` options, you may alternatively point to a server to obtain the required information. This may be used to compare the audio processing across different operating systems. For more information please read the sections about the `serve` and `update` command.
+
+---
+### Reduce Command
+
+    $ ./reta reduce -h
+    Try to identify the root cause of an regression error
+    Usage: reta reduce [OPTIONS]
+
+    Options:
+    -h,--help                   Print this help message and exit
+    -r,--reference TEXT REQUIRED      
+                                Path to reference plugin
+    -a,--actual TEXT REQUIRED   Path to SUT plugin
+    -l,--log TEXT REQUIRED      Path to results json of failed regression
+    -o,--output TEXT REQUIRED   Path to output json
+    -c,--config TEXT REQUIRED   Path to used config
+    -v,--verbose                Log results to console
+
+When you identified a regression error using the `compare` command, its not immediately clear which parameter(s) actually caused the issue, since all parameters may have a certain value. The `reduce` command implements the `ddmin` algorithm to try to identify the root cause of the error by iteratively removing parameters that do not trigger the error. For this to work both the reference plugin and the plugin under test must be available on the local machine. The `--log` option points to the `--output` of the `compare` command, `--config` is set to the `--config` of the `test` command used earlier. 
+
+---
+### Serve and Update Command
+    $ ./reta serve -h
+    Launch a http server to serve references.
+    Usage: reta serve [OPTIONS]
+
+    Options:
+    -h,--help                   Print this help message and exit
+    -p,--port UINT REQUIRED     Port to be listening on
+    -d,--directory TEXT REQUIRED
+                                Working directory
+
+    $ ./reta update -h
+    Update the reference for a plugin
+    Usage: reta update [OPTIONS]
+
+    Options:
+    -h,--help                   Print this help message and exit
+    -u,--url TEXT REQUIRED      URL of the reference server
+    -k,--key TEXT REQUIRED      Key of the plugin as used on the server
+    -r,--reference TEXT REQUIRED
+                                Local reference folder
+
+To be able to also compare the audio processing across operating systems, it is supported to provide the reference output using a simple built-in http-server. This is done via the `serve` command, which takes a port and a working directory as arguments. The specified directory will be used to serve `.zip` files that stem from the `test` command. To identify the right zip, you must choose a unique `key` per plugin (this may be the plugin name, but you may also choose to use any string). 
+The workflow is as follows:
+
+    # Start the server (this is a blocking command)
+    $ ./reta serve --port 8080 --directory ~/reta
+
+    # In a new console, generate the output files for the new reference
+    $ ./reta test --input reference.vst3 --config config.json --output reference/
+
+    # Upload the new reference to the server
+    $ ./reta upload --url http://localhost:8080 --key reference
+
+    # Now you can use it to compare like this:
+    $ ./reta compare --url http://localhost:8080 --key reference --actual ./actual.vst3 --output output.json
+
+---
+
+## Compilation
+### Requirements
+General requirements:
+
+    cmake git VS2019+ llvm10+ python3+ cppcheck clang-format [cmake-format]
+
+Additional requirements for linux:
+
+    pkg-config libgtk-3-dev libcurl4-openssl-dev libwebkit2gtk-4.0-dev libasound2-dev
+
+### Steps for compilation
+    git clone git@github.com:vallant/reta.git && cd reta
+    git submodule update --init --recursive
+    mkdir build && cd build 
+    cmake .. 
+    cmake --build . --config Release --target reta 
+    cmake --build . --config Release --target reta_test
+    cmake --build . --config Release --target run_tests
+    ./bin/Release/reta -h
+
+### Available CMake options
+* `-DUSE_ACTS=1`: ACTS is a different implementation of the combinatorial algorithm used to generate tests. While it is most likely more efficient both in terms of the required number of tests as well as the performance when generating, it has the drawback of being written in Java. Since in most cases the number of tests will be rather small, the default option is *not* to use ACTS. If you choose to enable ACTS, use this cmake-option when generating the project. Note that for compilation you will need the JDK8+ to be installed, and consumers of the program will need JRE8+ installed.
+
+# TODOs
+* Fix Linux Support
+* Fix VST2/AU Support
+* Implement frequency-based comparison
+* Implement STFT/FFT comparison visualization
+* Implement user-defined signals and test configuration
+* Implement pluginreg behaviour
+* Add github actions integration
