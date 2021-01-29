@@ -11,7 +11,7 @@ diff_folder = args.base_folder + "/diff"
 
 subprocess.run(f"mutate {args.target_file} cpp --mutantDir {src_folder} --noFastCheck".split(" "))
 
-mutants = os.listdir(args.base_folder)
+mutants = os.listdir(src_folder)
 for mutant in mutants:
     mutant_path = src_folder + "/" + mutant
 
