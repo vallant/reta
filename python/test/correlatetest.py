@@ -6,17 +6,19 @@ from ..reta.wav import Wav
 from ..reta import correlate
 import pathlib
 
+
 class CorrelateTestCase(unittest.TestCase):
 
     def setUp(self) -> None:
-        stereo_path = pathlib.Path(__file__).parent.joinpath(pathlib.Path("assets/48000-Stereo.wav"))
-        mono_path = pathlib.Path(__file__).parent.joinpath(pathlib.Path("assets/44100-Mono.wav"))
+        stereo_path = pathlib.Path(__file__).parent.joinpath(
+            pathlib.Path("assets/48000-Stereo.wav"))
+        mono_path = pathlib.Path(__file__).parent.joinpath(
+            pathlib.Path("assets/44100-Mono.wav"))
         self.stereo = Wav.from_file(stereo_path)
         self.mono = Wav.from_file(mono_path)
 
         self.mono.consolidate_inplace(self.stereo)
         self.stereo.consolidate_inplace(self.mono)
-
 
     def test_something(self):
 

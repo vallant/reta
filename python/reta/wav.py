@@ -2,6 +2,7 @@ import scipy.io.wavfile as wavfile
 import scipy.signal as sps
 import numpy
 
+
 class Wav:
 
     def __init__(self, sample_rate, channels):
@@ -32,11 +33,13 @@ class Wav:
 
     def resample(self, target_sample_rate):
         target_samples = self.num_samples() * target_sample_rate / self.sample_rate
-        self.channels = sps.resample(self.channels, round(target_samples), axis=1)
+        self.channels = sps.resample(
+            self.channels, round(target_samples), axis=1)
         self.sample_rate = target_sample_rate
 
     def reshape(self, target_channels, target_samples):
-        self.channels = numpy.resize(self.channels, (target_channels, target_samples))
+        self.channels = numpy.resize(
+            self.channels, (target_channels, target_samples))
 
     def consolidate_inplace(self, other):
         target_sample_rate = min(self.sample_rate, other.sample_rate)

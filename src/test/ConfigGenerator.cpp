@@ -22,8 +22,7 @@ std::vector<size_t> ConfigGenerator::signals()
 }
 std::vector<float> ConfigGenerator::values()
 {
-    //return {-1.0f, 0.0f, 0.25f, 0.5f, 0.75f, 1.0f};
-    return {-1.0f, 0.0f, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1.0f};
+    return {-1.0f, 0.0f, 0.25f, 0.5f, 0.75f, 1.0f};
 }
 TestConfigurations ConfigGenerator::generateRandom (const Plugin::Info& info,
                                                     const GenerateCommand::Parameters& parameters)
@@ -57,13 +56,13 @@ TestConfigurations ConfigGenerator::generateRandom (const Plugin::Info& info, co
                 continue;
 
             float value;
-            //if ( param.discrete )
-            //{
-//                auto valuesWithNegative = param.values;
-  //              valuesWithNegative.push_back (-1.0f);
-   //             value = random.nextFrom (valuesWithNegative);
-     //       }
-       //     else
+            if ( param.discrete )
+            {
+                auto valuesWithNegative = param.values;
+                valuesWithNegative.push_back (-1.0f);
+                value = random.nextFrom (valuesWithNegative);
+            }
+            else
             {
                 value = random.next (-0.1f, 1.0f);
             }

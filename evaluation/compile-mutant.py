@@ -1,10 +1,13 @@
 
-import argparse, subprocess, shutil, os
+import argparse
+import os
+import shutil
+import subprocess
 
 
 def get_current_mutant_filename(mutants):
     # the analyze-mutants command from universalmutator generates the killed.txt and notkilled.txt files
-    # the sum of all killed (=not-compiling) and not-killed (compiling) mutants indicates the current index 
+    # the sum of all killed (=not-compiling) and not-killed (compiling) mutants indicates the current index
     with open("killed.txt") as file:
         mutant_index = len(file.readlines())
     with open("notkilled.txt") as file:
@@ -23,11 +26,16 @@ def get_current_mutant_name(mutants, plugin_name):
 
 
 parser = argparse.ArgumentParser("compile-mutant")
-parser.add_argument("working_directory", help="Absolute path to working directory where the compile command should be executed (relative to current folder)")
-parser.add_argument("mutant_sources", help="Absolute path to folder containing mutant sources")
-parser.add_argument("compile_command", help="Command used to compile the plugin")
-parser.add_argument("plugin_output_path", help="Absolute path where the compiled plugin is located, including extension (e.g. bin/foo.vst3)")
-parser.add_argument("output_folder", help="Absolute path to output folder for mutant")
+parser.add_argument("working_directory",
+                    help="Absolute path to working directory where the compile command should be executed (relative to current folder)")
+parser.add_argument(
+    "mutant_sources", help="Absolute path to folder containing mutant sources")
+parser.add_argument("compile_command",
+                    help="Command used to compile the plugin")
+parser.add_argument("plugin_output_path",
+                    help="Absolute path where the compiled plugin is located, including extension (e.g. bin/foo.vst3)")
+parser.add_argument(
+    "output_folder", help="Absolute path to output folder for mutant")
 
 args = parser.parse_args()
 
@@ -44,7 +52,6 @@ mutants = os.listdir(args.mutant_sources)
 mutant_plugin_name = get_current_mutant_name(mutants, plugin_name)
 
 
-
 # e.g. build/mutants/foo.bar.0.vst3
 output_path = args.output_folder + "/" + mutant_plugin_name + "." + extension
 
@@ -56,7 +63,3 @@ if not os.path.exists(output_path):
 
     # copy to final destination
     shutil.copytree(args.plugin_output_path, output_path)
-
-
-
-

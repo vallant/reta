@@ -21,9 +21,11 @@ def test_mutant(current_mutant, actual):
 
     try:
         cmd(f"{args.reta} test -c {args.config} -i {args.mutants}/{current_mutant} -o {actual}")
-        process = cmd(f"{args.reta} compare -r {reference} -a {actual} -o foobar.json")
+        process = cmd(
+            f"{args.reta} compare -r {reference} -a {actual} -o foobar.json")
         mutex.acquire()
-        not_killed.append(current_mutant) if process.returncode == 0 else killed.append(current_mutant)
+        not_killed.append(
+            current_mutant) if process.returncode == 0 else killed.append(current_mutant)
         print_stats()
         mutex.release()
 

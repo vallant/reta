@@ -28,6 +28,7 @@ def cancelTime(lhs: Wav, rhs: Wav, show: bool = True):
     if show:
         plt.show()
 
+
 def cancelFrequency(lhs: Wav, rhs: Wav):
     N = 600
     T = 1.0 / 800.0
