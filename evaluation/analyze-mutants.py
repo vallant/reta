@@ -10,11 +10,13 @@ parser.add_argument("reta", help="path to reta")
 parser.add_argument("config", help="path to config")
 parser.add_argument("reference", help="path to reference plugin")
 parser.add_argument("mutants", help="path to mutant folder")
+parser.add_argument("experiment_name", help="Name that should be used to write logfiles")
+parser.add_argument("--timeout", default=600, help="Timeout for one test run in seconds. Default: 600", type=int)
 args = parser.parse_args()
 
 
 def cmd(command):
-    return subprocess.run(command.split(" "), timeout=600, capture_output=True)
+    return subprocess.run(command.split(" "), timeout=args.timeout, capture_output=True)
 
 
 def test_mutant(current_mutant, actual):
@@ -44,9 +46,9 @@ def print_stats():
 
 
 def write_stats():
-    with open("killed.txt", "w") as file:
+    with open(args.experiment_name + "_killed.txt", "w") as file:
         file.write("\n".join(killed))
-    with open("not_killed.txt", "w") as file:
+    with open(args.experiment_name + "_notkilled.txt", "w") as file:
         file.write("\n".join(not_killed))
 
 
@@ -68,7 +70,7 @@ if __name__ == '__main__':
         print("Testing reference: " + args.reference)
         cmd(f"{args.reta} test -c {args.config} -i {args.reference} -o {reference}")
 
-        with ThreadPool(10) as pool:
+        with ThreadPool(5) as pool:
             pool.map(worker, mutants)
 
     print()
