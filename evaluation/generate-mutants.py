@@ -1,17 +1,24 @@
-import argparse, subprocess, os
+import argparse
+import subprocess
+import os
 
 parser = argparse.ArgumentParser("generate-mutants.py")
 parser.add_argument("target_file", help="Path to file to mutate")
-parser.add_argument("mutations_folder", help="Path to folder for mutated source files")
-parser.add_argument("diff_folder", help="Path to folder for diffs")
+parser.add_argument(
+    "base_folder", help="Path to base folder for the mutation of this file")
 
 args = parser.parse_args()
 
-subprocess.run(f"mutate {args.target_file} cpp --mutantDir {args.mutations_folder} --noFastCheck".split(" "))
+src_folder = args.base_folder + "/src"
+diff_folder = args.base_folder + "/diff"
 
-mutants = os.listdir(args.mutations_folder)
+subprocess.run(
+    f"mutate {args.target_file} cpp --mutantDir {src_folder} --noFastCheck".split(" "))
+
+mutants = os.listdir(src_folder)
 for mutant in mutants:
-    mutant_path = args.mutations_folder + "/" + mutant
+    mutant_path = src_folder + "/" + mutant
 
-    with open(args.diff_folder + "/" + mutant + ".diff", "w") as file:
-        subprocess.run(f"diff --strip-trailing-cr -u {args.target_file} {mutant_path}".split(" "), stdout=file)
+    with open(diff_folder + "/" + mutant + ".diff", "w") as file:
+        subprocess.run(
+            f"diff --strip-trailing-cr -u {args.target_file} {mutant_path}".split(" "), stdout=file)

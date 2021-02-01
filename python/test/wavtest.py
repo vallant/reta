@@ -7,8 +7,10 @@ import numpy
 class WavTestCase(unittest.TestCase):
 
     def setUp(self) -> None:
-        stereo_path = pathlib.Path(__file__).parent.joinpath(pathlib.Path("assets/48000-Stereo.wav"))
-        mono_path = pathlib.Path(__file__).parent.joinpath(pathlib.Path("assets/44100-Mono.wav"))
+        stereo_path = pathlib.Path(__file__).parent.joinpath(
+            pathlib.Path("assets/48000-Stereo.wav"))
+        mono_path = pathlib.Path(__file__).parent.joinpath(
+            pathlib.Path("assets/44100-Mono.wav"))
         self.stereo = wav.Wav.from_file(stereo_path)
         self.mono = wav.Wav.from_file(mono_path)
 
